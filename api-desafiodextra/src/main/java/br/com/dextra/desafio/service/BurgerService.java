@@ -88,7 +88,16 @@ public class BurgerService {
     }	
 
 	public Burger buildFromRequest(final BurgerRequest burgerRequest) {
-		return null;
+		Burger.BurgerBuilder builder = Burger.builder().name(burgerRequest.getName());
+		
+		final List<String> ids = burgerRequest.getIngredientsId();
+		
+		if (ids != null)
+			builder.ingredients(ingredientService.fetchAll(ids));
+		else
+			builder.ingredients(null);
+		
+		return builder.build();		
 	}
 
 }
