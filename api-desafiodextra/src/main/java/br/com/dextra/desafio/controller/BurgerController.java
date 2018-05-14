@@ -56,11 +56,12 @@ public class BurgerController {
 	@ApiResponses(value = {
 			@ApiResponse(code = 201, message = "Item created"),
 			@ApiResponse(code = 400, message = "Invalid input, object invalid"),
+			@ApiResponse(code = 404, message = "Ingredient ID not found"),
 			@ApiResponse(code = 500, message = "Internal system error")})
 	@RequestMapping(value = BURGERS_URI, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON,
 	produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<BurgerResponse> create(
-			@ApiParam(value = "Burger to create") @Valid @RequestBody BurgerRequest burger) {
+			@ApiParam(value = "Burger to create") @Valid @RequestBody BurgerRequest burger) throws NotFoundException {
 		BurgerResponse saved = burgerService.save(burger);
 
 	    UriComponents resourceUri = ServletUriComponentsBuilder.fromCurrentRequest()

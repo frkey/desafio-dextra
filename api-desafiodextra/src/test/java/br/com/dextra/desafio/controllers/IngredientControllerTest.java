@@ -4,7 +4,6 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -15,7 +14,6 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,24 +27,16 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.com.dextra.desafio.controller.IngredientController;
-import br.com.dextra.desafio.domain.Ingredient;
-import br.com.dextra.desafio.dto.converter.IngredientToIngredientRequest;
-import br.com.dextra.desafio.dto.converter.IngredientToIngredientResponse;
-import br.com.dextra.desafio.dto.request.IngredientRequest;
 import br.com.dextra.desafio.dto.response.IngredientResponse;
 import br.com.dextra.desafio.exception.GlobalExceptionHandler;
 import br.com.dextra.desafio.exception.NotFoundException;
 import br.com.dextra.desafio.service.IngredientService;
+import br.com.dextra.desafio.services.IngredientsTestFactory;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IngredientControllerTest {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(IngredientControllerTest.class);
 	
-	@Spy
-	IngredientToIngredientRequest ingredientToRequest;
-	@Spy
-	IngredientToIngredientResponse ingredientToResponse;
+	private static final Logger LOGGER = LoggerFactory.getLogger(IngredientControllerTest.class);
 
 	@Mock
 	private IngredientService ingredientService;
@@ -69,7 +59,7 @@ public class IngredientControllerTest {
 
 	@Test
 	public void testFetchAll() throws Exception {
-		IngredientResponse ingredientResponse = defaultIngredientResponse();
+		IngredientResponse ingredientResponse = IngredientsTestFactory.defaultIngredientResponse();
 		
 		when(ingredientService.fetchAll()).thenReturn(Arrays.asList(ingredientResponse));
 
@@ -92,13 +82,13 @@ public class IngredientControllerTest {
 
 	@Test
 	public void testSave() throws Exception {
-		IngredientResponse ingredientResponse = defaultIngredientResponse();
+		IngredientResponse ingredientResponse = IngredientsTestFactory.defaultIngredientResponse();
 		
-		when(ingredientService.save(defaultIngredientRequest()))
+		when(ingredientService.save(IngredientsTestFactory.defaultIngredientRequest()))
 				.thenReturn(ingredientResponse);
 
 		mvc.perform(MockMvcRequestBuilders.post(IngredientController.INGREDIENTS_URI).contentType(MediaType.APPLICATION_JSON)
-				.content(mapper.writeValueAsString(defaultIngredientResponse()))).andDo(res -> {
+				.content(mapper.writeValueAsString(IngredientsTestFactory.defaultIngredientResponse()))).andDo(res -> {
 					String location = res.getResponse().getHeader("location");
 					LOGGER.info("Location: {}", location);
 					Assert.assertNotNull(location);
@@ -108,11 +98,11 @@ public class IngredientControllerTest {
 
 	@Test
 	public void testSaveWithSomeError() throws Exception {
-		when(ingredientService.save(defaultIngredientRequest()))
+		when(ingredientService.save(IngredientsTestFactory.defaultIngredientRequest()))
 				.thenThrow(new RuntimeException("Any error"));
 
 		mvc.perform(MockMvcRequestBuilders.post(IngredientController.INGREDIENTS_URI).contentType(MediaType.APPLICATION_JSON)
-				.content(mapper.writeValueAsString(defaultIngredientResponse())))
+				.content(mapper.writeValueAsString(IngredientsTestFactory.defaultIngredientResponse())))
 				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
 	}
@@ -122,7 +112,7 @@ public class IngredientControllerTest {
 	@Test
 	public void testFetch() throws Exception {
 		String id = "1";
-		IngredientResponse ingredientResponse = defaultIngredientResponse();
+		IngredientResponse ingredientResponse = IngredientsTestFactory.defaultIngredientResponse();
 		when(ingredientService.fetch(id)).thenReturn(ingredientResponse);
 
 		mvc.perform(MockMvcRequestBuilders.get(IngredientController.INGREDIENTS_URI + "/{ingredientId}", id))
@@ -145,20 +135,4 @@ public class IngredientControllerTest {
 		mvc.perform(MockMvcRequestBuilders.delete(IngredientController.INGREDIENTS_URI + "/{ingredientId}", "1"))
 				.andExpect(MockMvcResultMatchers.status().isOk());
 	}
-	
-	public static Ingredient defaultIngredient() {
-        return Ingredient.builder()
-                .id("1")
-                .name("Ovo")
-                .price(new BigDecimal("0.80"))
-                .build();
-    }
-
-    public IngredientRequest defaultIngredientRequest() {
-        return ingredientToRequest.convert(defaultIngredient());
-    }
-
-    public IngredientResponse defaultIngredientResponse() {
-        return ingredientToResponse.convert(defaultIngredient());
-    }
 }

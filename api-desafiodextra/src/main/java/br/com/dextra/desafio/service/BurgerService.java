@@ -1,6 +1,7 @@
 package br.com.dextra.desafio.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import br.com.dextra.desafio.domain.Burger;
-import br.com.dextra.desafio.dto.converter.BurgerToBurgerResponse;
+import br.com.dextra.desafio.domain.Ingredient;
 import br.com.dextra.desafio.dto.request.BurgerPartialRequest;
 import br.com.dextra.desafio.dto.request.BurgerRequest;
 import br.com.dextra.desafio.dto.response.BurgerResponse;
@@ -22,24 +23,20 @@ public class BurgerService {
 
 	final IngredientService ingredientService;
 
-	final BurgerToBurgerResponse burgerToResponse;
-
 	@Inject
 	public BurgerService(final BurgerRepository repository,
-			final IngredientService ingredientService,
-			final BurgerToBurgerResponse burgerToResponse) {
+			final IngredientService ingredientService) {
 		this.repository = repository;
 		this.ingredientService = ingredientService;
-		this.burgerToResponse = burgerToResponse;
 	}
 
 	public List<BurgerResponse> fetchAll() {
-        return burgerToResponse.convert(repository.findAll());
+        return repository.findAll().stream().map(c -> buildResponse(c)).collect(Collectors.toList());
     }
 
-	public BurgerResponse save(final BurgerRequest burgerRequest) {
+	public BurgerResponse save(final BurgerRequest burgerRequest) throws NotFoundException {
         final Burger savedBurger = repository.save(buildFromRequest(burgerRequest));
-        return burgerToResponse.convert(savedBurger);
+        return buildResponse(savedBurger);
     }
 
 	public BurgerResponse update(final BurgerRequest burgerRequest, final String id) throws NotFoundException {
@@ -48,7 +45,7 @@ public class BurgerService {
         Burger burger = buildFromRequest(burgerRequest);
         burger.setId(burgerResponse.getId());
 
-        return burgerToResponse.convert(repository.save(burger));
+        return buildResponse(repository.save(burger));
     }
 
     public BurgerResponse partialUpdate(final BurgerPartialRequest burgerRequest, final String id) throws NotFoundException {
@@ -64,14 +61,14 @@ public class BurgerService {
         
         final List<String> ingredientsId = burgerRequest.getIngredientsId();
         
-        if (ingredientsId != null) {
+        if (ingredientsId != null && !ingredientsId.isEmpty()) {
         	builder.ingredients(ingredientService.fetchAll(ingredientsId));
         }
 
         Burger burgerToUpdate = builder.build();
         repository.save(burgerToUpdate);
 
-        return burgerToResponse.convert(burgerToUpdate);
+        return buildResponse(burgerToUpdate);
     }
 
     public BurgerResponse fetch(final String id) throws NotFoundException {
@@ -79,7 +76,7 @@ public class BurgerService {
         if (burger == null) {
             throw new NotFoundException("Burger not found");
         }
-        return burgerToResponse.convert(burger);
+        return buildResponse(burger);
     }
 
     public void delete(final String id) throws NotFoundException {
@@ -87,17 +84,30 @@ public class BurgerService {
         repository.delete(id);
     }	
 
-	public Burger buildFromRequest(final BurgerRequest burgerRequest) {
+	public Burger buildFromRequest(final BurgerRequest burgerRequest) throws NotFoundException {
 		Burger.BurgerBuilder builder = Burger.builder().name(burgerRequest.getName());
 		
 		final List<String> ids = burgerRequest.getIngredientsId();
 		
-		if (ids != null)
-			builder.ingredients(ingredientService.fetchAll(ids));
-		else
+		if (ids != null && !ids.isEmpty()) {
+			final List<Ingredient> ingredients = ingredientService.fetchAll(ids);
+			
+			if (ingredients == null || ingredients.size() != ids.size())
+				throw new NotFoundException("Ingredient not found");
+			else
+				builder.ingredients(ingredients);
+		} else
 			builder.ingredients(null);
 		
 		return builder.build();		
 	}
+
+	private BurgerResponse buildResponse(Burger burger) {
+		return BurgerResponse.builder()
+				.id(burger.getId())
+				.name(burger.getName())
+				.ingredients(burger.getIngredients().stream().map(c -> ingredientService.buildResponse(c)).collect(Collectors.toList()))
+				.build();
+    }
 
 }
