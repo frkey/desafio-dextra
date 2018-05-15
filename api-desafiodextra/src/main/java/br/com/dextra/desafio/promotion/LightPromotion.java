@@ -1,6 +1,7 @@
 package br.com.dextra.desafio.promotion;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +12,7 @@ import br.com.dextra.desafio.domain.Ingredient;
 public class LightPromotion extends BurgerPrice {
 
 	@Override
-	public BigDecimal getPrice(final Burger burger) {
+	public List<BigDecimal> getPrice(final Burger burger) {
 		/* Se o lanche tem alface e não tem bacon, ganha 10% de desconto. */
 		BigDecimal price = BigDecimal.ZERO;
 		List<Ingredient> ingredients = burger.getIngredients();
@@ -31,7 +32,18 @@ public class LightPromotion extends BurgerPrice {
 		if (!hasBacon && hasLettuce)
 			price = price.multiply(new BigDecimal("0.9"));
 		
-		return price;
+		List<BigDecimal> prices = null;
+		if (successor != null) {
+			prices = successor.getPrice(burger);
+			
+			if (prices != null) {
+				prices.add(price);
+				return prices;
+			}
+		}
+		prices = new ArrayList<>();
+		prices.add(price);
+		return prices;
 	}
 
 }

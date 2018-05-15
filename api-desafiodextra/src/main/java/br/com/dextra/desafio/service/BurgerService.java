@@ -1,5 +1,6 @@
 package br.com.dextra.desafio.service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,6 +17,10 @@ import br.com.dextra.desafio.dto.request.BurgerRequest;
 import br.com.dextra.desafio.dto.response.BurgerResponse;
 import br.com.dextra.desafio.dto.response.IngredientResponse;
 import br.com.dextra.desafio.exception.NotFoundException;
+import br.com.dextra.desafio.promotion.BurgerPrice;
+import br.com.dextra.desafio.promotion.LightPromotion;
+import br.com.dextra.desafio.promotion.LotOfPromotion;
+import br.com.dextra.desafio.promotion.SimpleBurgerPrice;
 import br.com.dextra.desafio.repository.BurgerRepository;
 
 @Service
@@ -24,16 +29,41 @@ public class BurgerService {
 	final BurgerRepository repository;
 
 	final IngredientService ingredientService;
+	
+	final BurgerPrice priceWithoutDiscount;
+	final BurgerPrice priceWithLightPromotion;
+	final BurgerPrice priceWithLotOfMeatPromotion;
+	final BurgerPrice priceWithLotOfCheesePromotion;
 
 	@Inject
 	public BurgerService(final BurgerRepository repository,
 			final IngredientService ingredientService) {
 		this.repository = repository;
 		this.ingredientService = ingredientService;
+		
+		this.priceWithoutDiscount = new SimpleBurgerPrice();
+		this.priceWithLightPromotion = new LightPromotion();
+		this.priceWithLotOfMeatPromotion = new LotOfPromotion("carne");
+		this.priceWithLotOfCheesePromotion = new LotOfPromotion("queijo");
+		
+		priceWithoutDiscount.setSuccessor(priceWithLightPromotion);
+		priceWithLightPromotion.setSuccessor(priceWithLotOfMeatPromotion);
+		priceWithLotOfMeatPromotion.setSuccessor(priceWithLotOfCheesePromotion);
 	}
 
+	public List<BigDecimal> getPrices(final Burger burger) {
+		return priceWithoutDiscount.getPrice(burger);
+	}
+	
 	public List<BurgerResponse> fetchAll() {
         return repository.findAll().stream().map(c -> buildResponse(c)).collect(Collectors.toList());
+    }
+	
+	public List<Burger> fetchAll(final List<String> ids) {
+    	List<Burger> burgers = new ArrayList<>();    	
+    	repository.findAll(ids).forEach(burgers::add);
+    	
+    	return burgers;
     }
 
 	public BurgerResponse save(final BurgerRequest burgerRequest) throws NotFoundException {

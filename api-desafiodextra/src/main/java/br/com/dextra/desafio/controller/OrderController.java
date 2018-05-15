@@ -17,6 +17,7 @@ import org.springframework.web.util.UriComponents;
 
 import br.com.dextra.desafio.dto.request.OrderRequest;
 import br.com.dextra.desafio.dto.response.OrderResponse;
+import br.com.dextra.desafio.exception.BadRequestAPIException;
 import br.com.dextra.desafio.exception.NotFoundException;
 import br.com.dextra.desafio.service.OrderService;
 import io.swagger.annotations.Api;
@@ -60,7 +61,7 @@ public class OrderController {
 	@RequestMapping(value = ORDERS_URI, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON,
 	produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<Void> create(
-			@ApiParam(value = "Order to create") @Valid @RequestBody OrderRequest order) throws NotFoundException {
+			@ApiParam(value = "Order to create") @Valid @RequestBody OrderRequest order) throws NotFoundException, BadRequestAPIException {
 		OrderResponse saved = orderService.save(order);
 
 	    UriComponents resourceUri = ServletUriComponentsBuilder.fromCurrentRequest()

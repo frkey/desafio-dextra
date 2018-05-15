@@ -16,6 +16,7 @@ import br.com.dextra.desafio.dto.request.OrderRequest;
 import br.com.dextra.desafio.dto.response.BurgerResponse;
 import br.com.dextra.desafio.dto.response.IngredientResponse;
 import br.com.dextra.desafio.dto.response.OrderResponse;
+import br.com.dextra.desafio.exception.BadRequestAPIException;
 import br.com.dextra.desafio.exception.NotFoundException;
 import br.com.dextra.desafio.repository.OrderRepository;
 
@@ -24,17 +25,34 @@ public class OrderService {
 
 	final OrderRepository repository;
 	
+	final BurgerService burgerService;	
+	
 	@Inject
-	public OrderService(final OrderRepository repository) {
+	public OrderService(final OrderRepository repository,
+				final BurgerService burgerService) {
 		this.repository = repository;
+		this.burgerService = burgerService;
 	}
 
 	public List<OrderResponse> fetchAll() {
         return repository.findAll().stream().map(c -> buildResponse(c)).collect(Collectors.toList());
     }
 
-	public OrderResponse save(final OrderRequest orderRequest) {
-		Order order = buildFromRequest(orderRequest);
+	public OrderResponse save(final OrderRequest orderRequest) throws BadRequestAPIException, NotFoundException {
+		List<String> ids = new ArrayList<>();
+		final List<BurgerResponse> burgersResponse = orderRequest.getBurgers();
+		
+		for (BurgerResponse burgerResponse : burgersResponse) {
+			if (burgerResponse != null)
+				ids.add(burgerResponse.getId());
+			else
+				throw new BadRequestAPIException("Invalid Burger ID");
+		}
+		
+		if (burgerService.fetchAll(ids).size() != ids.size())
+			throw new NotFoundException("Burger ID not found");			
+		
+		Order order = buildFromRequest(orderRequest);		
 		order.setDateCreated(new Date());
 		
         Order savedOrder = repository.save(order);

@@ -30,7 +30,7 @@ public class LotOfPromotion extends BurgerPrice {
 	 * @return Description text text text.
 	 */
 	@Override
-	public BigDecimal getPrice(final Burger burger) {
+	public List<BigDecimal> getPrice(final Burger burger) {
 		/* A cada 3 porções do ingrediente o cliente só paga 2. Se o lanche tiver 6 porções, o cliente pagará 4. Assim por diante... */
 		BigDecimal price = BigDecimal.ZERO;
 		final List<Ingredient> ingredients = burger.getIngredients();		
@@ -54,7 +54,18 @@ public class LotOfPromotion extends BurgerPrice {
 			for (Ingredient ingredient: discountIngredients)
 				price = price.add(ingredient.getPrice());
 		
-		return price;
+		List<BigDecimal> prices = null;
+		if (successor != null) {
+			prices = successor.getPrice(burger);
+			
+			if (prices != null) {
+				prices.add(price);
+				return prices;
+			}
+		}
+		prices = new ArrayList<>();
+		prices.add(price);
+		return prices;
 	}
 
 }
