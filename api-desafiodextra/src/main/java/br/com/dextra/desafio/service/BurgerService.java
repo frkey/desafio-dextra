@@ -1,5 +1,6 @@
 package br.com.dextra.desafio.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,7 @@ import br.com.dextra.desafio.domain.Ingredient;
 import br.com.dextra.desafio.dto.request.BurgerPartialRequest;
 import br.com.dextra.desafio.dto.request.BurgerRequest;
 import br.com.dextra.desafio.dto.response.BurgerResponse;
+import br.com.dextra.desafio.dto.response.IngredientResponse;
 import br.com.dextra.desafio.exception.NotFoundException;
 import br.com.dextra.desafio.repository.BurgerRepository;
 
@@ -103,10 +105,23 @@ public class BurgerService {
 	}
 
 	private BurgerResponse buildResponse(Burger burger) {
+		List<IngredientResponse> ingredientsResponse = null;
+		final List<Ingredient> ingredients = burger.getIngredients();
+		
+		if (ingredients != null) {
+			ingredientsResponse = new ArrayList<>();
+			for (Ingredient ingredient : ingredients)
+				ingredientsResponse.add(IngredientResponse.builder()
+						.id(ingredient.getId())
+						.name(ingredient.getName())
+						.price(ingredient.getPrice())
+						.build());
+		}		
+		
 		return BurgerResponse.builder()
 				.id(burger.getId())
 				.name(burger.getName())
-				.ingredients(burger.getIngredients().stream().map(c -> ingredientService.buildResponse(c)).collect(Collectors.toList()))
+				.ingredients(ingredientsResponse)
 				.build();
     }
 

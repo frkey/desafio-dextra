@@ -60,7 +60,7 @@ public class BurgerController {
 			@ApiResponse(code = 500, message = "Internal system error")})
 	@RequestMapping(value = BURGERS_URI, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON,
 	produces = MediaType.APPLICATION_JSON)
-	public ResponseEntity<BurgerResponse> create(
+	public ResponseEntity<Void> create(
 			@ApiParam(value = "Burger to create") @Valid @RequestBody BurgerRequest burger) throws NotFoundException {
 		BurgerResponse saved = burgerService.save(burger);
 

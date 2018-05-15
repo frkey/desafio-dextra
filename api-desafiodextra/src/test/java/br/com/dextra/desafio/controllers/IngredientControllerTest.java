@@ -88,7 +88,7 @@ public class IngredientControllerTest {
 				.thenReturn(ingredientResponse);
 
 		mvc.perform(MockMvcRequestBuilders.post(IngredientController.INGREDIENTS_URI).contentType(MediaType.APPLICATION_JSON)
-				.content(mapper.writeValueAsString(IngredientsTestFactory.defaultIngredientResponse()))).andDo(res -> {
+				.content(mapper.writeValueAsString(IngredientsTestFactory.defaultIngredientRequest()))).andDo(res -> {
 					String location = res.getResponse().getHeader("location");
 					LOGGER.info("Location: {}", location);
 					Assert.assertNotNull(location);
@@ -102,7 +102,7 @@ public class IngredientControllerTest {
 				.thenThrow(new RuntimeException("Any error"));
 
 		mvc.perform(MockMvcRequestBuilders.post(IngredientController.INGREDIENTS_URI).contentType(MediaType.APPLICATION_JSON)
-				.content(mapper.writeValueAsString(IngredientsTestFactory.defaultIngredientResponse())))
+				.content(mapper.writeValueAsString(IngredientsTestFactory.defaultIngredientRequest())))
 				.andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
 	}
