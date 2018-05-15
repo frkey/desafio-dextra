@@ -24,121 +24,102 @@ import br.com.dextra.desafio.repository.OrderRepository;
 public class OrderService {
 
 	final OrderRepository repository;
-	
-	final BurgerService burgerService;	
-	
+
+	final BurgerService burgerService;
+
 	@Inject
-	public OrderService(final OrderRepository repository,
-				final BurgerService burgerService) {
+	public OrderService(final OrderRepository repository, final BurgerService burgerService) {
 		this.repository = repository;
 		this.burgerService = burgerService;
 	}
 
 	public List<OrderResponse> fetchAll() {
-        return repository.findAll().stream().map(c -> buildResponse(c)).collect(Collectors.toList());
-    }
+		return repository.findAll().stream().map(c -> buildResponse(c)).collect(Collectors.toList());
+	}
 
 	public OrderResponse save(final OrderRequest orderRequest) throws BadRequestAPIException, NotFoundException {
 		List<String> ids = new ArrayList<>();
 		final List<BurgerResponse> burgersResponse = orderRequest.getBurgers();
-		
+
 		for (BurgerResponse burgerResponse : burgersResponse) {
 			if (burgerResponse != null)
 				ids.add(burgerResponse.getId());
 			else
 				throw new BadRequestAPIException("Invalid Burger ID");
 		}
-		
+
 		if (burgerService.fetchAll(ids).size() != ids.size())
-			throw new NotFoundException("Burger ID not found");			
-		
-		Order order = buildFromRequest(orderRequest);		
+			throw new NotFoundException("Burger ID not found");
+
+		Order order = buildFromRequest(orderRequest);
 		order.setDateCreated(new Date());
-		
-        Order savedOrder = repository.save(order);
-        return buildResponse(savedOrder);
-    }
+
+		Order savedOrder = repository.save(order);
+		return buildResponse(savedOrder);
+	}
 
 	public OrderResponse fetch(String id) throws NotFoundException {
-        Order order = repository.findOne(id);
-        if (order == null) {
-            throw new NotFoundException("Order not found");
-        }
-        return buildResponse(order);
-    }
+		Order order = repository.findOne(id);
+		if (order == null) {
+			throw new NotFoundException("Order not found");
+		}
+		return buildResponse(order);
+	}
 
-    public OrderResponse update(OrderRequest orderRequest, String id) throws NotFoundException {
-        OrderResponse orderResponse = fetch(id);
+	public OrderResponse update(OrderRequest orderRequest, String id) throws NotFoundException {
+		OrderResponse orderResponse = fetch(id);
 
-        Order order = buildFromRequest(orderRequest);
-        order.setId(orderResponse.getId());
+		Order order = buildFromRequest(orderRequest);
+		order.setId(orderResponse.getId());
 
-        return buildResponse(repository.save(order));
-    }
+		return buildResponse(repository.save(order));
+	}
 
-    public void delete(String id) throws NotFoundException {
-        fetch(id);
-        repository.delete(id);
-    }
+	public void delete(String id) throws NotFoundException {
+		fetch(id);
+		repository.delete(id);
+	}
 
 	private Order buildFromRequest(OrderRequest orderRequest) {
 		List<Burger> burgers = null;
 		List<Ingredient> ingredients;
 		List<IngredientResponse> ingredientsResponse = null;
 		final List<BurgerResponse> burgersResponse = orderRequest.getBurgers();
-		
+
 		if (burgersResponse != null) {
 			burgers = new ArrayList<>();
 			for (BurgerResponse burgerResponse : burgersResponse) {
 				ingredientsResponse = burgerResponse.getIngredients();
 				ingredients = null;
-				
+
 				if (ingredientsResponse != null) {
 					ingredients = new ArrayList<>();
 					for (IngredientResponse ingredientResponse : ingredientsResponse)
-						ingredients.add(Ingredient.builder()
-									.id(ingredientResponse.getId())
-									.name(ingredientResponse.getName())
-									.price(ingredientResponse.getPrice())
-									.build());
-				}				
-				burgers.add(Burger.builder()
-						.id(burgerResponse.getId())
-						.name(burgerResponse.getName())
-						.ingredients(ingredients)
-						.build());
+						ingredients.add(Ingredient.builder().id(ingredientResponse.getId())
+								.name(ingredientResponse.getName()).price(ingredientResponse.getPrice()).build());
+				}
+				burgers.add(Burger.builder().id(burgerResponse.getId()).name(burgerResponse.getName())
+						.ingredients(ingredients).build());
 			}
 		}
-		
-        return Order.builder()
-        		.burgers(burgers)
-        		.build();
-    }
 
-    private OrderResponse buildResponse(Order order) {
-    	List<BurgerResponse> burgers = new ArrayList<>();
-    	List<IngredientResponse> ingredients;
-    	
-    	for (Burger burger : order.getBurgers()) {
-    		ingredients = new ArrayList<>();
-    		for (Ingredient ingredient : burger.getIngredients())
-    			ingredients.add(IngredientResponse.builder()
-    						.id(ingredient.getId())
-    						.name(ingredient.getName())
-    						.price(ingredient.getPrice())
-    						.build());
-    		
-    		burgers.add(BurgerResponse.builder()
-					.id(burger.getId())
-					.name(burger.getName())
-					.ingredients(ingredients)
+		return Order.builder().burgers(burgers).build();
+	}
+
+	private OrderResponse buildResponse(Order order) {
+		List<BurgerResponse> burgers = new ArrayList<>();
+		List<IngredientResponse> ingredients;
+
+		for (Burger burger : order.getBurgers()) {
+			ingredients = new ArrayList<>();
+			for (Ingredient ingredient : burger.getIngredients())
+				ingredients.add(IngredientResponse.builder().id(ingredient.getId()).name(ingredient.getName())
+						.price(ingredient.getPrice()).build());
+
+			burgers.add(BurgerResponse.builder().id(burger.getId()).name(burger.getName()).ingredients(ingredients)
 					.build());
-    	}	
-    	
-    	return OrderResponse.builder()
-				.id(order.getId())
-				.dateCreated(order.getDateCreated())
-				.burgers(burgers)
-				.build();
-    }
+		}
+
+		return OrderResponse.builder().id(order.getId()).dateCreated(order.getDateCreated()).burgers(burgers).build();
+	}
 }

@@ -51,76 +51,72 @@ public class BurgerController {
 		return ResponseEntity.ok(burgerService.fetchAll());
 	}
 
-	@ApiOperation(value = "Creates new burger",
-			httpMethod = "POST", nickname = "createBurger", tags = "burgers")
-	@ApiResponses(value = {
-			@ApiResponse(code = 201, message = "Item created"),
+	@ApiOperation(value = "Creates new burger", httpMethod = "POST", nickname = "createBurger", tags = "burgers")
+	@ApiResponses(value = { @ApiResponse(code = 201, message = "Item created"),
 			@ApiResponse(code = 400, message = "Invalid input, object invalid"),
 			@ApiResponse(code = 404, message = "Ingredient ID not found"),
-			@ApiResponse(code = 500, message = "Internal system error")})
-	@RequestMapping(value = BURGERS_URI, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON,
-	produces = MediaType.APPLICATION_JSON)
-	public ResponseEntity<Void> create(
-			@ApiParam(value = "Burger to create") @Valid @RequestBody BurgerRequest burger) throws NotFoundException {
+			@ApiResponse(code = 500, message = "Internal system error") })
+	@RequestMapping(value = BURGERS_URI, method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON, produces = MediaType.APPLICATION_JSON)
+	public ResponseEntity<Void> create(@ApiParam(value = "Burger to create") @Valid @RequestBody BurgerRequest burger)
+			throws NotFoundException {
 		BurgerResponse saved = burgerService.save(burger);
 
-	    UriComponents resourceUri = ServletUriComponentsBuilder.fromCurrentRequest()
-	            .path("/{burgerId}")
-	            .buildAndExpand(saved.getId());
+		UriComponents resourceUri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{burgerId}")
+				.buildAndExpand(saved.getId());
 
-	    return ResponseEntity.created(resourceUri.toUri()).build();
+		return ResponseEntity.created(resourceUri.toUri()).build();
 	}
 
-	@ApiOperation(value = "List all data about a burger",
-			httpMethod = "GET", nickname = "getBurger", response = BurgerResponse.class, tags = "burgers")
-	@ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "A single burger", response = BurgerResponse.class),
-        @ApiResponse(code = 404, message = "Burger with this ID not found") })
-	@RequestMapping(value = BURGERS_URI + "/{burgerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "List all data about a burger", httpMethod = "GET", nickname = "getBurger", response = BurgerResponse.class, tags = "burgers")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "A single burger", response = BurgerResponse.class),
+			@ApiResponse(code = 404, message = "Burger with this ID not found") })
+	@RequestMapping(value = BURGERS_URI
+			+ "/{burgerId}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON)
 	public ResponseEntity<BurgerResponse> fetchBurger(
-			@ApiParam(value = "ID of burger that needs to be fetched", required=true) @PathVariable("burgerId") String id) throws NotFoundException {
-	    return ResponseEntity.ok(burgerService.fetch(id));
+			@ApiParam(value = "ID of burger that needs to be fetched", required = true) @PathVariable("burgerId") String id)
+			throws NotFoundException {
+		return ResponseEntity.ok(burgerService.fetch(id));
 	}
 
-	@ApiOperation(value = "Replaces a burger",
-			httpMethod = "PUT", nickname = "replaceBurger", tags = "burgers")
-	@ApiResponses(value = {
-			@ApiResponse(code = 200, message = "Item replaced"),
+	@ApiOperation(value = "Replaces a burger", httpMethod = "PUT", nickname = "replaceBurger", tags = "burgers")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Item replaced"),
 			@ApiResponse(code = 400, message = "Invalid input, object invalid"),
 			@ApiResponse(code = 404, message = "The burger (or any of supplied IDs) is not found"),
-			@ApiResponse(code = 500, message = "Internal system error")})
-	@RequestMapping(value = BURGERS_URI + "/{burgerId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON)	
-    public ResponseEntity<Void> replace(
-    		@ApiParam(value = "ID of burger that needs to be replaced", required=true) @PathVariable("burgerId") String id,
-    		@ApiParam(value = "Burger to replace") @Valid @RequestBody BurgerRequest burgerRequest) throws NotFoundException {
+			@ApiResponse(code = 500, message = "Internal system error") })
+	@RequestMapping(value = BURGERS_URI
+			+ "/{burgerId}", method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON)
+	public ResponseEntity<Void> replace(
+			@ApiParam(value = "ID of burger that needs to be replaced", required = true) @PathVariable("burgerId") String id,
+			@ApiParam(value = "Burger to replace") @Valid @RequestBody BurgerRequest burgerRequest)
+			throws NotFoundException {
 		burgerService.update(burgerRequest, id);
-	    return ResponseEntity.ok().build();    	
-    }
+		return ResponseEntity.ok().build();
+	}
 
-	@ApiOperation(value = "Modifies a burger",
-			httpMethod = "PATCH", nickname = "modifyBurger", tags = "burgers")
-	@ApiResponses(value = { 
-	        @ApiResponse(code = 200, message = "Item modified"),
-	        @ApiResponse(code = 400, message = "Invalid input, object invalid"),
-	        @ApiResponse(code = 404, message = "The burger (or any of supplied IDs) is not found"),
-	        @ApiResponse(code = 500, message = "Internal system error")})
-	@RequestMapping(value = BURGERS_URI + "/{burgerId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON)
+	@ApiOperation(value = "Modifies a burger", httpMethod = "PATCH", nickname = "modifyBurger", tags = "burgers")
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Item modified"),
+			@ApiResponse(code = 400, message = "Invalid input, object invalid"),
+			@ApiResponse(code = 404, message = "The burger (or any of supplied IDs) is not found"),
+			@ApiResponse(code = 500, message = "Internal system error") })
+	@RequestMapping(value = BURGERS_URI
+			+ "/{burgerId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON)
 	public ResponseEntity<Void> partialUpdate(
-			@ApiParam(value = "ID of burger that needs to be modified",required=true) @PathVariable("burgerId") String id,
-    		@ApiParam(value = "Burger data with one or more fields filled") @Valid @RequestBody BurgerPartialRequest burgerRequest) throws NotFoundException {
-	    burgerService.partialUpdate(burgerRequest, id);
-	    return ResponseEntity.ok().build();
+			@ApiParam(value = "ID of burger that needs to be modified", required = true) @PathVariable("burgerId") String id,
+			@ApiParam(value = "Burger data with one or more fields filled") @Valid @RequestBody BurgerPartialRequest burgerRequest)
+			throws NotFoundException {
+		burgerService.partialUpdate(burgerRequest, id);
+		return ResponseEntity.ok().build();
 	}
 
 	@ApiOperation(value = "Deletes a burger", httpMethod = "DELETE", nickname = "deleteIngredient", tags = "burgers")
-    @ApiResponses(value = { 
-	        @ApiResponse(code = 200, message = "Item deleted"),
-	        @ApiResponse(code = 404, message = "The burger is not found") })	
+	@ApiResponses(value = { @ApiResponse(code = 200, message = "Item deleted"),
+			@ApiResponse(code = 404, message = "The burger is not found") })
 	@RequestMapping(value = BURGERS_URI + "/{burgerId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteIngredient(
-    		@ApiParam(value = "ID of burger that needs to be deleted", required=true) @PathVariable("burgerId") String id) throws NotFoundException {
+	public ResponseEntity<Void> deleteIngredient(
+			@ApiParam(value = "ID of burger that needs to be deleted", required = true) @PathVariable("burgerId") String id)
+			throws NotFoundException {
 		burgerService.delete(id);
-	    return ResponseEntity.ok().build();
+		return ResponseEntity.ok().build();
 	}
 
 }
