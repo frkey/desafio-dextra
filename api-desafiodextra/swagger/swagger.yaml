@@ -1,0 +1,472 @@
+swagger: '2.0'
+info:
+  description: Desafio API
+  version: 1.0.0
+  title: Desafio Dextra API
+  contact:
+    name: Felipe Carvalho
+    email: frkey@outlook.com
+  license:
+    name: MIT
+    url: 'https://github.com/frkey/desafio-dextra/blob/master/LICENSE'
+host: 'localhost:8080'
+basePath: /
+paths:
+  /burgers:
+    get:
+      tags:
+        - burgers
+      summary: List all burgers
+      operationId: listBurgers
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: List of burgers
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BurgerResponse'
+        '400':
+          description: Error in request parameters
+        '422':
+          description: Business error
+        '500':
+          description: Internal system error
+    post:
+      tags:
+        - burgers
+      summary: Creates new burger
+      operationId: createBurger
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: burger
+          description: Burger to create
+          required: false
+          schema:
+            $ref: '#/definitions/BurgerRequest'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Item created
+        '400':
+          description: 'Invalid input, object invalid'
+        '404':
+          description: Ingredient ID not found
+        '500':
+          description: Internal system error
+  '/burgers/{burgerId}':
+    get:
+      tags:
+        - burgers
+      summary: List all data about a burger
+      operationId: getBurger
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: burgerId
+          in: path
+          description: ID of burger that needs to be fetched
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A single burger
+          schema:
+            $ref: '#/definitions/BurgerResponse'
+        '404':
+          description: Burger with this ID not found
+    put:
+      tags:
+        - burgers
+      summary: Replaces a burger
+      operationId: replaceBurger
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: burgerId
+          in: path
+          description: ID of burger that needs to be replaced
+          required: true
+          type: string
+        - in: body
+          name: burgerRequest
+          description: Burger to replace
+          required: false
+          schema:
+            $ref: '#/definitions/BurgerRequest'
+      responses:
+        '200':
+          description: Item replaced
+        '400':
+          description: 'Invalid input, object invalid'
+        '404':
+          description: The burger (or any of supplied IDs) is not found
+        '500':
+          description: Internal system error
+    delete:
+      tags:
+        - burgers
+      summary: Deletes a burger
+      operationId: deleteIngredient
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: burgerId
+          in: path
+          description: ID of burger that needs to be deleted
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Item deleted
+        '404':
+          description: The burger is not found
+    patch:
+      tags:
+        - burgers
+      summary: Modifies a burger
+      operationId: modifyBurger
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: burgerId
+          in: path
+          description: ID of burger that needs to be modified
+          required: true
+          type: string
+        - in: body
+          name: burgerRequest
+          description: Burger data with one or more fields filled
+          required: false
+          schema:
+            $ref: '#/definitions/BurgerPartialRequest'
+      responses:
+        '200':
+          description: Item modified
+        '400':
+          description: 'Invalid input, object invalid'
+        '404':
+          description: The burger (or any of supplied IDs) is not found
+        '500':
+          description: Internal system error
+  /ingredients:
+    get:
+      tags:
+        - ingredients
+      summary: List all ingredients
+      operationId: listIngredients
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: List of ingredients
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/IngredientResponse'
+        '400':
+          description: Error in request parameters
+        '422':
+          description: Business error
+        '500':
+          description: Internal system error
+    post:
+      tags:
+        - ingredients
+      summary: Creates new ingredient
+      operationId: createIngredient
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: ingredient
+          description: Ingredient to create
+          required: false
+          schema:
+            $ref: '#/definitions/IngredientRequest'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Item created
+        '400':
+          description: 'Invalid input, object invalid'
+        '500':
+          description: Internal system error
+  '/ingredients/{ingredientId}':
+    get:
+      tags:
+        - ingredients
+      summary: List all data about a ingredient
+      operationId: getIngredient
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: ingredientId
+          in: path
+          description: ID of ingredient that needs to be fetched
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A single ingredient
+          schema:
+            $ref: '#/definitions/IngredientResponse'
+        '404':
+          description: Ingredient with this ID not found
+    delete:
+      tags:
+        - ingredients
+      summary: Deletes a ingredient
+      operationId: deleteIngredient_1
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: ingredientId
+          in: path
+          description: ID of ingredient that needs to be deleted
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Item deleted
+        '404':
+          description: The ingredient is not found
+  /orders:
+    get:
+      tags:
+        - orders
+      summary: List all orders
+      operationId: listOrders
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: List of orders
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/OrderResponse'
+        '400':
+          description: Error in request parameters
+        '422':
+          description: Business error
+        '500':
+          description: Internal system error
+    post:
+      tags:
+        - orders
+      summary: Creates new order
+      operationId: createOrder
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: order
+          description: Order to create
+          required: false
+          schema:
+            $ref: '#/definitions/OrderRequest'
+      responses:
+        '200':
+          description: OK
+        '201':
+          description: Item created
+        '400':
+          description: 'Invalid input, object invalid'
+        '404':
+          description: Burger ID not found
+        '500':
+          description: Internal system error
+  '/orders/{orderId}':
+    get:
+      tags:
+        - orders
+      summary: List all data about a order
+      operationId: getOrder
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of order that needs to be fetched
+          required: true
+          type: string
+      responses:
+        '200':
+          description: A single order
+          schema:
+            $ref: '#/definitions/OrderResponse'
+        '404':
+          description: Order with this ID not found
+    put:
+      tags:
+        - orders
+      summary: Replaces a order
+      operationId: replaceOrder
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of order that needs to be replaced
+          required: true
+          type: string
+        - in: body
+          name: orderRequest
+          description: Order to replace
+          required: false
+          schema:
+            $ref: '#/definitions/OrderRequest'
+      responses:
+        '200':
+          description: Item replaced
+        '400':
+          description: 'Invalid input, object invalid'
+        '404':
+          description: The order (or any of supplied IDs) is not found
+        '500':
+          description: Internal system error
+    delete:
+      tags:
+        - orders
+      summary: Deletes a order
+      operationId: deleteIngredient_2
+      consumes:
+        - application/json
+      produces:
+        - '*/*'
+      parameters:
+        - name: orderId
+          in: path
+          description: ID of order that needs to be deleted
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Item deleted
+        '404':
+          description: The order is not found
+definitions:
+  BurgerResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        example: 5af71925cca98113e0647044
+        description: 'Internal Burger ID, uniquely identifying this burger in the menu.'
+      name:
+        type: string
+        example: X-Burger
+        description: Burger name.
+      ingredients:
+        type: array
+        description: List with the ingredients.
+        items:
+          $ref: '#/definitions/IngredientResponse'
+  BurgerRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        example: X-Burger
+        description: Burger name.
+      ingredientsId:
+        type: array
+        description: List with the ingredients IDs.
+        items:
+          type: string
+  IngredientRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        example: Bacon
+        description: Ingredient name.
+      price:
+        type: number
+        format: double
+        description: Ingredient price.
+  OrderRequest:
+    type: object
+    properties:
+      burgers:
+        type: array
+        description: List with the burgers.
+        items:
+          $ref: '#/definitions/BurgerResponse'
+  IngredientResponse:
+    type: object
+    properties:
+      id:
+        type: string
+        example: 5af6f48d3be5d83d14b6119f
+        description: 'Internal Ingredient ID, uniquely identifying this ingredient in the menu.'
+      name:
+        type: string
+        example: Bacon
+        description: Ingredient name.
+      price:
+        type: number
+        format: double
+        description: Ingredient price.
+  OrderResponse:
+    type: object
+    properties:
+      burgers:
+        type: array
+        description: List with the burgers.
+        items:
+          $ref: '#/definitions/BurgerResponse'
+      dateCreated:
+        type: string
+        format: date-time
+        description: Order creation date.
+      id:
+        type: string
+        example: 5af71925cca98113e0647044
+        description: Internal Order ID.
+  BurgerPartialRequest:
+    type: object
+    properties:
+      name:
+        type: string
+        example: X-Burger
+        description: Burger name.
+      ingredientsId:
+        type: array
+        description: List with the ingredients IDs.
+        items:
+          type: string
