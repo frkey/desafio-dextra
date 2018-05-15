@@ -1,0 +1,9 @@
+version: '3'
+
+services:
+  frontend-desafiodextra:
+    build: ./..
+    image: "frkey/frontend-desafiodextra"
+    container_name: "frontend-desafiodextra"
+    expose:
+      - "8081"

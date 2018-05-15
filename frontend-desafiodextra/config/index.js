@@ -18,10 +18,26 @@ module.exports = {
   },
   dev: {
     env: require('./dev.env'),
-    port: 8080,
+    port: 8081,
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/ingredients/**': {
+        pathRewrite: { '^/ingredients': '' },
+        target: 'http://localhost:8080/ingredients',
+        changeOrigin: true
+      },
+      '/burgers/**': {
+        pathRewrite: { '^/burgers': '' },
+        target: 'http://localhost:8080/burgers',
+        changeOrigin: true
+      },
+      '/orders/**': {
+        pathRewrite: { '^/orders': '' },
+        target: 'http://localhost:8080/orders',
+        changeOrigin: true
+      }
+    },
     // CSS Sourcemaps off by default because relative paths are "buggy"
     // with this option, according to the CSS-Loader README
     // (https://github.com/webpack/css-loader#sourcemaps)

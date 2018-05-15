@@ -1,5 +1,7 @@
 import DashView from './components/Dash.vue'
+import ForbbidenView from './components/403.vue'
 import NotFoundView from './components/404.vue'
+import ErrorView from './components/500.vue'
 
 // Import Views - Dash
 import DashboardView from './components/views/Dashboard.vue'
@@ -36,6 +38,12 @@ const routes = [
         meta: {description: 'Orders CRUD'}
       }
     ]
+  }, {
+    path: '/forbbiden',
+    component: ForbbidenView
+  }, {
+    path: '/error',
+    component: ErrorView
   }, {
     // not found handler
     path: '*',
