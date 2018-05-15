@@ -19,7 +19,7 @@ public class Order {
     private String id;
 	
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-	private Date creationDate;
+	private Date dateCreated;
 	
 	private List<Burger> burgers;
 

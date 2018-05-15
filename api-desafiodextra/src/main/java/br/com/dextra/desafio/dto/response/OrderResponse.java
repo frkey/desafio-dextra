@@ -3,6 +3,7 @@ package br.com.dextra.desafio.dto.response;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,8 +33,9 @@ public class OrderResponse {
 	 * @return burgers
 	 **/
 	@ApiModelProperty(value = "Order creation date.")
-	@JsonProperty("creationDate")
-	private Date creationDate;
+	@JsonProperty("dateCreated")
+	@JsonFormat(pattern="dd/MM/yyyy HH:mm")
+	private Date dateCreated;
 
 	/**
 	 * List with the burgers.

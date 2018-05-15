@@ -35,7 +35,7 @@ public class OrderService {
 
 	public OrderResponse save(final OrderRequest orderRequest) {
 		Order order = buildFromRequest(orderRequest);
-		order.setCreationDate(new Date());
+		order.setDateCreated(new Date());
 		
         Order savedOrder = repository.save(order);
         return buildResponse(savedOrder);
@@ -119,7 +119,7 @@ public class OrderService {
     	
     	return OrderResponse.builder()
 				.id(order.getId())
-				.creationDate(order.getCreationDate())
+				.dateCreated(order.getDateCreated())
 				.burgers(burgers)
 				.build();
     }
