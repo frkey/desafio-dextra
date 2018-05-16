@@ -16,19 +16,7 @@ public class LotOfPromotion extends BurgerPrice {
 	public LotOfPromotion(final String ingredientName) {
 		this.ingredientName = ingredientName;
 	}
-	
-	/**
-	 * Short one line description.
-	 * <p>
-	 * Longer description. If there were any, it would be
-	 * here.
-	 * <p>
-	 * And even more explanations to follow in consecutive
-	 * paragraphs separated by HTML paragraph breaks.
-	 *
-	 * @param  variable Description text text text.
-	 * @return Description text text text.
-	 */
+
 	@Override
 	public List<BigDecimal> getPrice(final Burger burger) {
 		/* A cada 3 porções do ingrediente o cliente só paga 2. Se o lanche tiver 6 porções, o cliente pagará 4. Assim por diante... */
